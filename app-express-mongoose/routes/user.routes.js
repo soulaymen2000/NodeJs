@@ -1,59 +1,95 @@
-const express=require('express');
-const router=express.Router();
-const User=require('../models/user');
-router.post('/register',async(req,res)=>{
-    try{
-        const user=new User(req.body);
-        await user.save();
-        res.status(201).send({Message: 'User created successfully', user});
-        
-        
+const express = require('express')
+const User = require('../models/user')
+const router = express.Router()
 
-    }catch(err){
-        res.status(500).send({message : err});
+router.post('/',async (req,res)=>{
+    try{
+        const user = new User(req.body)
+        await user.save()
+        res.status(201).send({message:'user saved successfully', user})
+    } catch (error) {
+        res.status(500).send({message:error})
     }
 })
+
+
 router.get('/all',async(req,res)=>{
     try{
-        const users=await User.find();
-        res.status(200).send(users);
-    }catch(err){
-        res.status(500).send({message:err});
+        const users = await User.find()
+        res.status(200).send({users})
+    } catch (error) {
+        res.status(500).send({message:error})
     }
 })
-router.get('/find:name',async(req,res)=>{
+
+router.get('/:name',async(req,res)=>{
     try{
-        const user=await User.findOne({name:req.params.name});
-        res.status(200).send(user);
-    }catch(err){
-        res.status(404).send({message:err});
+        const name = req.params.name
+        const users = await User.findOne({name})
+        if(users){
+            res.status(200).send({users})
+        }else{
+        res.status(404).send({message:"user not found"})
+        }
+    } catch (error) {
+       
     }
 })
-router.get('/find:id',async(req,res)=>{
+
+router.patch('/update/:id',async(req,res)=>{
     try{
-        
-        const user=await User.findById(req.params.id);
-        res.status(200).send(user);
-    }catch(err){
-        res.status(404).send({message:err});
+        const users = await User.findById(req.params.id,req.body)
+        res.status(200).send({users})
+    } catch (error) {
+        res.status(500).send({message:error})
     }
 })
-router.patch('/update:id',async(req,res)=>{
+router.put('/update/:name',async(req,res)=>{
     try{
-        await User.findByIdAndUpdate(req.params.id,req.body);
-        res.status(200).send({message:'User updated successfully'});
-    }catch(err){
-        res.status(404).send({message:err});
+        const name = req.params.name
+        const users = await User
+        .findOneAndUpdate({name},req.body,{new:true})
+        res.status(200).send({users})
+    } catch (error) {
+        res.status(500).send({message:error})
+    }  
+})
+
+
+router.delete('/delete/:id',async(req,res)=>{
+    try{
+        const users = await User.findByIdAndDelete(req.params.id)
+        res.status(200).send({message:"user deleted successfully"})
+    } catch (error) {
+        res.status(500).send({message:error})
     }
 })
-router.delete('/delete:id',async(req,res)=>{
+router.delete('/delete/all',async(req,res)=>{
     try{
-        await User.findByIdAndDelete(req.params.id);
-        res.status(200).send({message:'User deleted successfully'});
-    }catch(err){
-        res.status(500).send({message:err});
+        const users = await User.deleteMany()
+        res.status(200).send({message:"all users deleted successfully"})
+    } catch (error) {
+        res.status(500).send({message:error})
+    }
+})
+router.delete('/delete/:name',async(req,res)=>{
+    try{
+        const name = req.params.name
+        const users = await User
+        .findOneAndDelete({name})
+        res.status(200).send({message:"user deleted successfully"})
+    } catch (error) {
+        res.status(500).send({message:error})
     }
 }
 )
-    
-module.exports=router;
+router.get('/user/:id',async(req,res)=>{
+    try{
+        const users = await User.findById(req.params.id)
+        res.status(200).send({users})
+    } catch (error) {
+        res.status(500).send({message:error})
+    }
+})
+
+module.exports = router;
