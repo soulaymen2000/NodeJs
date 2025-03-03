@@ -4,7 +4,9 @@ app.use(express.json());
 const mongoose=require('mongoose');
 require('dotenv').config();
 const userRoutes=require('./routes/user.routes');
+const AuthRoutes=require('./routes/auth.routes')
 app.use('/users',userRoutes);
+app.use('/auth',AuthRoutes);
 
 const PORT = process.env.PORT || 3000;
 mongoose.connect(process.env.MONGO_URI).then(()=>{console.log('Connected to MongoDB')}).catch(err=>{console.log('Error:',err)});
